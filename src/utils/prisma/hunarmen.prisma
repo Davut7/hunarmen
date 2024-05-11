@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../../node_modules/@prisma/hunarmen"
+   previewFeatures = ["tracing"]
+  errorFormat = "pretty"
+}
+
+
+model AdminUsers {
+  id  String   @id @default(uuid()) @map("id")
+  firstName          String
+  password            String
+  role          AdminRoleEnum
+  createdAt     DateTime @default(now()) @map("created_at")
+  token AdminToken?
+  @@map("admin_users")
+}
+
+
+model AdminToken {
+  id String @id @default(uuid()) @map("id")
+  refreshToken String  @map("refresh_token")
+  userId String @unique() @map("user_id")
+  user  AdminUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("admin_tokens")
+}
+
+enum DownReason {
+  NORMAL
+  TIMEOUT
+}
+
+enum AdminRoleEnum {
+  ADMIN
+  MODERATOR
+  ROOT
+}
